@@ -34,6 +34,7 @@ def get_assistants():
 class Chatbot:
     def __init__(self):
         self.conversation_history = []
+        self.thread = self.create_thread()
 
     def add_message(self, user_message, bot_response):
         self.conversation_history.append({"user": user_message, "bot": bot_response})
@@ -81,18 +82,17 @@ class Chatbot:
         return run
 
     def pretty_print(self, messages):
-        print("# Messages\n")
         str = ""
         for m in messages:
-            str += f"{m.role}: {m.content[0].text.value}"
+            if m.role == 'assistant':
+                str += f"\nBot: {m.content[0].text.value}"
         return str
 
     def chat(self, user_message, assistant_id="asst_QSzB2T0DjTV8on1Cm1kSINch"):
-        thread = self.create_thread()
-        self.add_message_to_thread(thread, user_message)
-        run = self.create_run(thread, assistant_id)
-        run = self.wait_on_run(run, thread)
-        messages = client.beta.threads.messages.list(thread_id=thread.id)
+        self.add_message_to_thread(self.thread, user_message)
+        run = self.create_run(self.thread, assistant_id)
+        run = self.wait_on_run(run, self.thread)
+        messages = client.beta.threads.messages.list(thread_id=self.thread.id)
 
         bot_response = self.pretty_print(messages) 
         self.add_message(user_message, bot_response)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
             break
 
         response = chatbot.chat(user_message)
-        print(f"Bot: {response}")
+        print(f"{response}")
 
         # Print the current context for debugging
 #         # print("Context:", chatbot.get_context())
