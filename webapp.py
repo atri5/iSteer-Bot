@@ -28,8 +28,7 @@ ini_response = "Hello! I am here to assist you with any questions regarding Tibc
 # Initialize session state to store the conversation history
 if 'messages' not in st.session_state:
     st.session_state.messages = []
-    with st.chat_message("Assistant"):
-        st.markdown(ini_response)
+    st.session_state.messages.append({"role": "Assistant", "content" : ini_response})
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
